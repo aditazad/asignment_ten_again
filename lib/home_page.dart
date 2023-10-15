@@ -24,6 +24,75 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController firstController = TextEditingController();
   TextEditingController secondController = TextEditingController();
 
+  void _showOptionsDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Options'),
+          content: Text('Choose an option'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                _showEditBottomSheet(index);
+                Navigator.of(context).pop();
+              },
+              child: Text('Edit'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  items.removeAt(index);
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditBottomSheet(int index) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: firstController..text = items[index].split(' - ')[0],
+                decoration: InputDecoration(
+                  hintText: 'Enter the first item',
+                ),
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller: secondController..text = items[index].split(' - ')[1],
+                decoration: InputDecoration(
+                  hintText: 'Enter the second item',
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    items[index] = '${firstController.text} - ${secondController.text}';
+                  });
+                  Navigator.pop(context);
+                },
+                child: Text('Edit'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,16 +119,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 separatorBuilder: (context, index) => SizedBox(height: 10),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: EdgeInsets.all(12),
-                    child: ListTile(
-                      leading: Text('${index + 1}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      title: Text(items[index], style: TextStyle(fontSize: 16)),
-                      trailing: Icon(Icons.arrow_forward),
+                  return GestureDetector(
+                    onTap: () {
+                      _showOptionsDialog(index);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: EdgeInsets.all(12),
+                      child: ListTile(
+                        leading: Text('${index + 1}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        title: Text(items[index], style: TextStyle(fontSize: 16)),
+                        trailing: Icon(Icons.arrow_forward),
+                      ),
                     ),
                   );
                 },
