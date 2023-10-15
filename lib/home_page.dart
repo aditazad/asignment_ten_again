@@ -24,7 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController firstController = TextEditingController();
   TextEditingController secondController = TextEditingController();
 
-  void _showOptionsDialog(int index) {
+  void _showOptionsDialog(int index, BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                _showEditBottomSheet(index);
+                _showEditBottomSheet(context, index);
                 Navigator.of(context).pop();
               },
               child: Text('Edit'),
@@ -54,43 +54,56 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _showEditBottomSheet(int index) {
+  void _showEditBottomSheet(BuildContext context, int index) {
+    TextEditingController editFirstController =
+    TextEditingController(text: items[index].split(' - ')[0]);
+    TextEditingController editSecondController =
+    TextEditingController(text: items[index].split(' - ')[1]);
+
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: firstController..text = items[index].split(' - ')[0],
-                decoration: InputDecoration(
-                  hintText: 'Enter the first item',
-                ),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: editFirstController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter the first item',
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: editSecondController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter the second item',
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        items[index] =
+                        '${editFirstController.text} - ${editSecondController.text}';
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: Text('Edit'),
+                  ),
+                ],
               ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: secondController..text = items[index].split(' - ')[1],
-                decoration: InputDecoration(
-                  hintText: 'Enter the second item',
-                ),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    items[index] = '${firstController.text} - ${secondController.text}';
-                  });
-                  Navigator.pop(context);
-                },
-                child: Text('Edit'),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
-    );
+    ).whenComplete(() {
+      editFirstController.dispose();
+      editSecondController.dispose();
+    });
   }
 
   @override
@@ -121,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      _showOptionsDialog(index);
+                      _showOptionsDialog(index, context);
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -130,7 +143,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       padding: EdgeInsets.all(12),
                       child: ListTile(
-                        leading: Text('${index + 1}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        leading: Text('${index + 1}',
+                            style:
+                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         title: Text(items[index], style: TextStyle(fontSize: 16)),
                         trailing: Icon(Icons.arrow_forward),
                       ),
