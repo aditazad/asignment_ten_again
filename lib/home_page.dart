@@ -24,7 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController firstController = TextEditingController();
   TextEditingController secondController = TextEditingController();
 
-  void _showOptionsDialog(int index, BuildContext context) {
+  void _showOptionsDialog(int index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -34,8 +34,8 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                _showEditBottomSheet(context, index);
                 Navigator.of(context).pop();
+                _showEditBottomSheet(index);
               },
               child: Text('Edit'),
             ),
@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _showEditBottomSheet(BuildContext context, int index) {
+  void _showEditBottomSheet(int index) {
     TextEditingController editFirstController =
     TextEditingController(text: items[index].split(' - ')[0]);
     TextEditingController editSecondController =
@@ -134,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      _showOptionsDialog(index, context);
+                      _showOptionsDialog(index);
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -144,8 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.all(12),
                       child: ListTile(
                         leading: Text('${index + 1}',
-                            style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         title: Text(items[index], style: TextStyle(fontSize: 16)),
                         trailing: Icon(Icons.arrow_forward),
                       ),
